@@ -16,10 +16,10 @@ git push -u origin main
 2. Click "New Project" → "Deploy from GitHub repo"
 3. Select your repository
 4. Railway auto-detects Django
-5. Add environment variables:
-   - `SECRET_KEY` (generate with command below)
-   - `DEBUG=False`
-   - `ALLOWED_HOSTS=your-app-name.railway.app`
+5. Add environment variables (OPTIONAL - Auto-detected now):
+   - `SECRET_KEY` (generate with command below - Recommended)
+   - `DEBUG=False` (Recommended for production)
+   - `ALLOWED_HOSTS` is now auto-detected - no need to set it!
 6. Deploy! Your app is live
 
 ### 3. Create Admin User

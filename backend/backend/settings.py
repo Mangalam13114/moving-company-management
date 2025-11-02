@@ -7,7 +7,21 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-^&iln2bcr5^p_au1#bw@+
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = []
+
+if 'ALLOWED_HOSTS' in os.environ:
+    ALLOWED_HOSTS = [host.strip() for host in os.environ.get('ALLOWED_HOSTS').split(',')]
+elif os.environ.get('RAILWAY_ENVIRONMENT'):
+    ALLOWED_HOSTS = ['*']
+elif 'RAILWAY_PUBLIC_DOMAIN' in os.environ:
+    domain = os.environ['RAILWAY_PUBLIC_DOMAIN']
+    ALLOWED_HOSTS = [domain, f'*.{domain.split(".", 1)[1]}' if '.' in domain else domain]
+elif 'RENDER_EXTERNAL_HOSTNAME' in os.environ:
+    ALLOWED_HOSTS = [os.environ['RENDER_EXTERNAL_HOSTNAME']]
+elif 'HEROKU_APP_NAME' in os.environ:
+    ALLOWED_HOSTS = [f"{os.environ['HEROKU_APP_NAME']}.herokuapp.com"]
+else:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
