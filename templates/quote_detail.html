@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>📋 Quote Details - #{{ quote.id }}</h2>
+            <a href="{% url 'home' %}" class="btn btn-secondary">← Back to Home</a>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">👤 Customer Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Name:</strong> {{ quote.customer.name }}</p>
+                        <p><strong>Email:</strong> {{ quote.customer.email }}</p>
+                        <p><strong>Phone:</strong> {{ quote.customer.phone }}</p>
+                        <p><strong>Address:</strong> {{ quote.customer.address }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">📊 Quote Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Move Date:</strong> {{ quote.move_date|date:"F d, Y" }}</p>
+                        <p><strong>Items:</strong> <span class="badge bg-secondary">{{ quote.items }}</span></p>
+                        <p><strong>Distance:</strong> {{ quote.distance_km }} km</p>
+                        <p><strong>Estimated Cost:</strong> <span style="font-size: 1.5rem; font-weight: 700; color: var(--success-color);">₹{{ quote.estimated_cost|floatformat:2 }}</span></p>
+                        <p><strong>Status:</strong> 
+                            <span class="badge bg-{% if quote.status == 'Completed' %}success{% elif quote.status == 'Pending' %}warning{% elif quote.status == 'Approved' %}info{% else %}secondary{% endif %}">
+                                {{ quote.status }}
+                            </span>
+                        </p>
+                        
+                        {% if user.is_staff %}
+                        <hr>
+                        <form method="POST" action="{% url 'update_quote_status' quote.id %}" class="mt-3">
+                            {% csrf_token %}
+                            <label class="form-label"><strong>Update Status (Admin Only):</strong></label>
+                            <div class="input-group">
+                                <select name="status" class="form-select">
+                                    <option value="Pending" {% if quote.status == 'Pending' %}selected{% endif %}>⏳ Pending</option>
+                                    <option value="Approved" {% if quote.status == 'Approved' %}selected{% endif %}>✅ Approved</option>
+                                    <option value="Completed" {% if quote.status == 'Completed' %}selected{% endif %}>🎉 Completed</option>
+                                    <option value="Cancelled" {% if quote.status == 'Cancelled' %}selected{% endif %}>❌ Cancelled</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </form>
+                        {% else %}
+                        <div class="alert alert-info mt-3">
+                            <small>ℹ️ Only administrators can update quote status.</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">📦 Inventory Items</h5>
+                        <a href="{% url 'inventory_detail' quote.id %}" class="btn btn-light btn-sm">➕ Manage Inventory</a>
+                    </div>
+                    <div class="card-body">
+                        {% if inventory_items %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Item Name</th>
+                                            <th>Quantity</th>
+                                            <th>Fragile</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in inventory_items %}
+                                        <tr>
+                                            <td><strong>{{ item.item_name }}</strong></td>
+                                            <td><span class="badge bg-secondary">{{ item.quantity }}</span></td>
+                                            <td>{% if item.fragile %}<span class="badge bg-warning">⚠️ Yes</span>{% else %}<span class="badge bg-success">✓ No</span>{% endif %}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
+                                <p class="text-muted">No inventory items added yet.</p>
+                                <a href="{% url 'inventory_detail' quote.id %}" class="btn btn-primary">➕ Add Items</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

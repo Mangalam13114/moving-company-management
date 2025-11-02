@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if not user.is_authenticated %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+            <div class="card-body text-center py-5">
+                <h2 class="mb-3">Welcome to Moving Company Management System</h2>
+                <p class="mb-4" style="font-size: 1.1rem;">Please login or sign up to access the system features</p>
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="{% url 'login' %}" class="btn btn-light btn-lg">🔐 Login</a>
+                    <a href="{% url 'signup' %}" class="btn btn-outline-light btn-lg">📝 Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1 class="mb-4">📊 Dashboard Overview</h1>
+    </div>
+</div>
+
+{% if user.is_authenticated %}
+<div class="row mb-4">
+    <div class="col-md-4 mb-4">
+        <div class="stat-card stat-card-primary">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5>📋 Total Quotes</h5>
+                    <h2>{{ total_quotes }}</h2>
+                </div>
+                <div style="font-size: 3rem; opacity: 0.3;">📋</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="stat-card stat-card-warning">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5>⏳ Pending Quotes</h5>
+                    <h2>{{ pending_quotes }}</h2>
+                </div>
+                <div style="font-size: 3rem; opacity: 0.3;">⏳</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="stat-card stat-card-success">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5>✅ Completed Moves</h5>
+                    <h2>{{ completed_quotes }}</h2>
+                </div>
+                <div style="font-size: 3rem; opacity: 0.3;">✅</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">📝 Recent Customer Quotes</h5>
+                {% if user.is_authenticated %}
+                <a href="{% url 'quote_form' %}" class="btn btn-light btn-sm">
+                    ➕ New Quote
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if quotes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>👤 Customer</th>
+                                    <th>📧 Email</th>
+                                    <th>📅 Move Date</th>
+                                    <th>📦 Items</th>
+                                    <th>🚗 Distance (km)</th>
+                                    <th>💰 Estimated Cost</th>
+                                    <th>📊 Status</th>
+                                    <th>⚙️ Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for quote in quotes %}
+                                <tr>
+                                    <td><strong>{{ quote.customer.name }}</strong></td>
+                                    <td>{{ quote.customer.email }}</td>
+                                    <td>{{ quote.move_date|date:"M d, Y" }}</td>
+                                    <td><span class="badge bg-secondary">{{ quote.items }}</span></td>
+                                    <td>{{ quote.distance_km }} km</td>
+                                    <td><strong style="color: var(--success-color); font-size: 1.1rem;">₹{{ quote.estimated_cost|floatformat:2 }}</strong></td>
+                                    <td>
+                                        <span class="badge bg-{% if quote.status == 'Completed' %}success{% elif quote.status == 'Pending' %}warning{% elif quote.status == 'Approved' %}info{% else %}secondary{% endif %}">
+                                            {{ quote.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'quote_detail' quote.id %}" class="btn btn-sm btn-info">👁️ View</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">📋</div>
+                        <h4 class="text-muted mb-3">No quotes yet</h4>
+                        <p class="text-muted mb-4">Get started by creating your first quote!</p>
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'quote_form' %}" class="btn btn-primary btn-lg">➕ Create Your First Quote</a>
+                        {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-primary btn-lg">🔐 Login to Create Quote</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>📦 Inventory Management</h2>
+            {% if quote %}
+                <a href="{% url 'inventory' %}" class="btn btn-secondary">← Back to Inventory</a>
+            {% endif %}
+        </div>
+        
+        {% if quote %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">➕ Add Item to Quote #{{ quote.id }} - {{ quote.customer.name }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="item_name" class="form-label">📦 Item Name *</label>
+                            <input type="text" class="form-control" id="item_name" name="item_name" placeholder="e.g., Sofa, Refrigerator" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="quantity" class="form-label">🔢 Quantity *</label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" min="1" value="1" required>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check mt-4 pt-3">
+                                <input class="form-check-input" type="checkbox" id="fragile" name="fragile" style="width: 20px; height: 20px;">
+                                <label class="form-check-label ms-2" for="fragile" style="font-size: 1rem;">
+                                    ⚠️ Fragile Item
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <div>
+                                <button type="submit" class="btn btn-primary w-100">➕ Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">📋 Inventory Items</h5>
+            </div>
+            <div class="card-body">
+                {% if inventory_items %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>Quantity</th>
+                                    <th>Fragile</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in inventory_items %}
+                                <tr>
+                                    <td><strong>{{ item.item_name }}</strong></td>
+                                    <td><span class="badge bg-secondary" style="font-size: 1rem; padding: 8px 12px;">{{ item.quantity }}</span></td>
+                                    <td>{% if item.fragile %}<span class="badge bg-warning">⚠️ Yes</span>{% else %}<span class="badge bg-success">✓ No</span>{% endif %}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">📦</div>
+                        <p class="text-muted mb-4">No items in inventory yet. Add your first item above!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">📋 Select a Quote</h5>
+            </div>
+            <div class="card-body">
+                <p>Please select a quote to manage inventory:</p>
+                {% if quotes %}
+                    <div class="list-group">
+                        {% for q in quotes %}
+                        <a href="{% url 'inventory_detail' q.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">👤 {{ q.customer.name }}</h6>
+                                <small>Quote #{{ q.id }}</small>
+                            </div>
+                            <p class="mb-1">📧 {{ q.customer.email }}</p>
+                            <small>📅 Move Date: {{ q.move_date|date:"M d, Y" }} | 📦 Items: {{ q.items }}</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">📋</div>
+                        <p class="text-muted mb-4">No quotes available.</p>
+                        <a href="{% url 'quote_form' %}" class="btn btn-primary btn-lg">➕ Create a Quote First</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

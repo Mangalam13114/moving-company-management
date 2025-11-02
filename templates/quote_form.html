@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>➕ Create New Quote</h2>
+            <a href="{% url 'home' %}" class="btn btn-secondary">← Back to Home</a>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Quote Information</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="quoteForm">
+                    {% csrf_token %}
+                    
+                    <h5 class="mb-4" style="color: var(--primary-color);">👤 Customer Information</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="customer_name" class="form-label">Customer Name *</label>
+                            <input type="text" class="form-control" id="customer_name" name="customer_name" placeholder="Enter full name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">📞 Phone Number *</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" placeholder="+91 1234567890" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">📧 Email Address *</label>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="customer@example.com" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="move_date" class="form-label">📅 Preferred Move Date *</label>
+                            <input type="date" class="form-control" id="move_date" name="move_date" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="address" class="form-label">📍 Delivery Address *</label>
+                        <textarea class="form-control" id="address" name="address" rows="3" placeholder="Enter complete address" required></textarea>
+                    </div>
+                    
+                    <hr class="my-4" style="border-top: 2px solid #e2e8f0;">
+                    <h5 class="mb-4" style="color: var(--secondary-color);">🚚 Moving Details</h5>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="items" class="form-label">📦 Number of Items *</label>
+                            <input type="number" class="form-control" id="items" name="items" min="1" placeholder="e.g., 20" required>
+                            <small class="text-muted">Total number of items to be moved</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="distance_km" class="form-label">🚗 Distance (km) *</label>
+                            <input type="number" class="form-control" id="distance_km" name="distance_km" step="0.1" min="0" placeholder="e.g., 50.5" required>
+                            <small class="text-muted">Distance in kilometers</small>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mb-4" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-left: 4px solid var(--info-color);">
+                        <div class="d-flex align-items-center">
+                            <div style="font-size: 2rem; margin-right: 1rem;">💰</div>
+                            <div>
+                                <strong style="font-size: 1.1rem; color: #1e40af;">Estimated Cost:</strong>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--success-color);" id="estimated_cost">₹0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">✅ Create Quote</button>
+                        <a href="{% url 'home' %}" class="btn btn-secondary">❌ Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function calculateCost() {
+        const items = parseFloat(document.getElementById('items').value) || 0;
+        const distance = parseFloat(document.getElementById('distance_km').value) || 0;
+        
+        const baseRate = 500;
+        const perKmRate = 15;
+        const perItemRate = 50;
+        
+        const total = baseRate + (perKmRate * distance) + (perItemRate * items);
+        const formatted = total.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+        document.getElementById('estimated_cost').textContent = '₹' + formatted;
+    }
+    
+    document.getElementById('items').addEventListener('input', calculateCost);
+    document.getElementById('distance_km').addEventListener('input', calculateCost);
+</script>
+{% endblock %}
