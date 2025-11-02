@@ -7,108 +7,127 @@ A comprehensive web application built with Django for managing a moving company'
 - **Customer Management**: Store and manage customer information
 - **Quote Generation**: Create quotes with automatic cost calculation
 - **Inventory Tracking**: Track items for each move
-- **Move Scheduling**: Schedule moves with driver and vehicle information
-- **Insurance Claims**: Manage insurance claims for moves
+- **Move Scheduling**: Schedule moves with driver and vehicle information (Admin Only)
+- **Insurance Claims**: Users can submit claims, Admins can approve them
+- **User Authentication**: Login/Signup system with role-based access
 - **Admin Panel**: Full Django admin interface for data management
 
 ## 🛠️ Tech Stack
 
 - **Backend**: Python 3.13, Django 5.2.7
 - **Frontend**: HTML, CSS, JavaScript, Bootstrap 5.3
-- **Database**: SQLite
+- **Database**: SQLite (development), PostgreSQL (production)
 - **Additional Packages**: 
   - Pillow (image handling)
   - django-crispy-forms (form rendering)
-  - reportlab (PDF generation - ready for future use)
+  - reportlab (PDF generation)
+  - gunicorn (production server)
+  - whitenoise (static files)
 
 ## 📁 Project Structure
 
 ```
-moving_company_management/
+pro1/
 │
 ├── backend/
 │   ├── manage.py
-│   ├── backend/                 # Main project folder (settings, URLs)
-│   └── company/                 # Django app (main logic)
-│       ├── models.py            # Database models
-│       ├── views.py             # View functions
-│       ├── urls.py              # URL routing
-│       └── admin.py             # Admin configuration
+│   ├── backend/                 
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   └── company/                 
+│       ├── models.py            
+│       ├── views.py             
+│       ├── urls.py              
+│       └── admin.py             
 │
-├── templates/                   # All HTML templates
+├── templates/                   
 │   ├── base.html
 │   ├── home.html
 │   ├── quote_form.html
 │   ├── quote_detail.html
 │   ├── inventory.html
 │   ├── schedule.html
-│   └── insurance.html
+│   ├── insurance.html
+│   ├── login.html
+│   └── signup.html
 │
-├── static/                      # Static files
+├── static/                      
 │   ├── css/
 │   │   └── style.css
 │   └── js/
 │       └── script.js
 │
-├── venv/                        # Virtual environment
-└── README.md
+├── requirements.txt
+├── Procfile
+├── runtime.txt
+├── .gitignore
+└── DEPLOYMENT.md
 ```
 
-## 🚀 Setup Instructions
+## 🚀 Local Setup Instructions
 
-### 1. Activate Virtual Environment
+### Step 1: Activate Virtual Environment
 
-**Windows (PowerShell):**
 ```powershell
 .\venv\Scripts\Activate.ps1
 ```
 
-**Windows (CMD):**
-```cmd
-venv\Scripts\activate.bat
+### Step 2: Install Dependencies
+
+```powershell
+pip install -r requirements.txt
 ```
 
-**Linux/Mac:**
-```bash
-source venv/bin/activate
-```
+### Step 3: Navigate to Backend
 
-### 2. Install Dependencies
-
-All dependencies should already be installed. If not, run:
-```bash
-pip install django pillow django-crispy-forms reportlab
-```
-
-### 3. Run Migrations
-
-```bash
+```powershell
 cd backend
+```
+
+### Step 4: Run Migrations
+
+```powershell
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 4. Create Superuser (Admin)
+### Step 5: Create Admin User
 
-```bash
+```powershell
 python manage.py createsuperuser
 ```
 
-Follow the prompts to create an admin account.
+### Step 6: Run Development Server
 
-### 5. Run Development Server
-
-```bash
+```powershell
 python manage.py runserver
 ```
 
-Visit: **http://127.0.0.1:8000/**
+### Step 7: Access Application
 
-Admin Panel: **http://127.0.0.1:8000/admin/**
+- **Main Site**: http://127.0.0.1:8000/
+- **Admin Panel**: http://127.0.0.1:8000/admin/
+
+## 👥 User Roles & Permissions
+
+### 👤 Regular User
+- ✅ Create new quotes
+- ✅ View quote details
+- ✅ Add items to inventory
+- ✅ Submit insurance claims
+- ❌ Cannot schedule moves
+- ❌ Cannot approve insurance claims
+- ❌ Cannot update quote status
+
+### ⚙️ Admin User
+- ✅ All regular user permissions
+- ✅ Schedule moves
+- ✅ Approve/reject insurance claims
+- ✅ Update quote status (Pending/Approved/Completed/Cancelled)
+- ✅ Full access to Django admin panel
 
 ## 💰 Cost Calculation Formula
-
-The system automatically calculates moving costs using:
 
 ```
 Total Cost = Base Rate + (Distance × Per Km Rate) + (Items × Per Item Rate)
@@ -119,84 +138,46 @@ Where:
 - Per Km Rate = ₹15
 - Per Item Rate = ₹50
 
-Example:
+**Example:**
 - 20 items, 50 km distance
-- Cost = 500 + (50 × 15) + (20 × 50) = 500 + 750 + 1000 = ₹2,250
+- Cost = 500 + (50 × 15) + (20 × 50) = ₹2,250
 
-## 📝 Usage Guide
+## 🌐 Deployment
 
-### Creating a Quote
+This project is ready for deployment on various platforms. See `DEPLOYMENT.md` for detailed instructions on:
 
-1. Navigate to "New Quote" from the navigation menu
-2. Fill in customer information
-3. Enter move details (date, items, distance)
-4. The system automatically calculates the estimated cost
-5. Submit to create the quote
+- Railway
+- Render
+- Heroku
+- PythonAnywhere
 
-### Managing Inventory
+Quick deployment steps are in `DEPLOYMENT.md`.
 
-1. Go to "Inventory" page
-2. Select a quote
-3. Add items with quantities and fragility status
+## 📝 Available URLs
 
-### Scheduling Moves
+- `/` - Homepage (Dashboard)
+- `/login/` - User Login
+- `/signup/` - User Registration
+- `/quote/` - Create New Quote
+- `/quote/<id>/` - View Quote Details
+- `/inventory/` - Manage Inventory
+- `/inventory/<id>/` - Inventory for Specific Quote
+- `/schedule/` - Schedule Moves (Admin Only)
+- `/insurance/` - Insurance Claims
+- `/admin/` - Django Admin Panel
 
-1. Go to "Schedule" page
-2. Select a quote
-3. Choose date, time, driver, and vehicle
-4. Save the schedule
+## 🔐 Security Notes
 
-### Insurance Claims
-
-1. Go to "Insurance" page
-2. Select a quote
-3. Enter claim details and status
-4. Submit to create the claim
-
-## 🔐 Admin Panel
-
-Access the Django admin panel at `/admin/` to:
-- View and edit all database records
-- Manage customers, quotes, inventory, schedules, and insurance claims
-- Perform bulk operations
-- Export data
-
-## 🎨 Customization
-
-### Modifying Cost Calculation
-
-Edit the `calculate_cost()` function in `backend/company/views.py`:
-
-```python
-def calculate_cost(items, distance):
-    base_rate = 500  # Change this
-    per_km_rate = 15  # Change this
-    per_item_rate = 50  # Change this
-    return base_rate + (per_km_rate * distance) + (per_item_rate * items)
-```
-
-### Styling
-
-Modify `static/css/style.css` to customize the appearance.
-
-## 🚧 Future Enhancements
-
-- Customer authentication system
-- Email notifications
-- PDF invoice generation
-- Image uploads for inventory items
-- Advanced reporting and analytics
-- Mobile app integration
+- Secret key should be changed in production
+- Use environment variables for sensitive data
+- Set `DEBUG=False` in production
+- Configure `ALLOWED_HOSTS` properly
+- Use HTTPS in production
 
 ## 📄 License
 
 This project is created for educational purposes.
 
-## 👤 Author
-
-Moving Company Management System - 2025
-
 ---
 
-**Happy Moving! 🚚**
-
+**Built with ❤️ using Django**
